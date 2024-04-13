@@ -1,0 +1,87 @@
+version: "3.8"
+networks:
+#  frontend:
+#    driver: ${NETWORKS_DRIVER}
+  backend:
+    driver: ${NETWORKS_DRIVER}
+volumes:
+#  mysql:
+#    driver: ${VOLUMES_DRIVER}
+  psgl:
+    driver: ${VOLUMES_DRIVER}
+  redis:
+    driver: ${VOLUMES_DRIVER}
+
+services:
+
+  ### Application(PHP/Laravel  php-fpm) #########################################
+  php-fpm:
+    container_name: ${PROJECT_NAME}-php
+    build:
+      context: ./docker/php-fpm
+      dockerfile: Dockerfile
+    ports:
+      - 5173:5173
+    volumes:
+      - ${WORK_DIR_BACKEND}:/var/www/application
+      - ./docker/php-fpm/settings/php.ini:/usr/local/etc/php/php.ini
+      - ./docker/php-fpm/settings/www.dev.conf:/usr/local/etc/php-fpm.d/www.confFROM
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=${PSGL_PORT}
+      - DB_DATABASE=${PSGL_NAME}
+      - DB_USERNAME=${PSGL_USER}
+      - DB_PASSWORD=${PSGL_PASSWORD}
+    networks:
+      - backend
+
+  ### NGINX Server #########################################
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    container_name: ${PROJECT_NAME}-nginx
+    ports:
+      - "${NGINX_HTTP_PORT}:80"
+      - "${NGINX_HTTPS_PORT}:443"
+    volumes:
+      - ${WORK_DIR_BACKEND}:/var/www/application
+      - ./docker/docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/docker/nginx/conf.d/nginx.conf:/etc/nginx/nginx.conf
+      - ${DATA_PATH}/logs/nginx:/var/log/nginx
+      - ./docker/docker/nginx/certs:/etc/ssl/certs
+#    depends_on:
+#      - php
+    networks:
+      - backend
+
+  ### PostgreSQL #################################################
+  psgl:
+    container_name: ${PROJECT_NAME}-psgl
+    build:
+      context: ./docker/postgres
+      dockerfile: Dockerfile
+    ports:
+      - ${PSGL_PORT}:5432
+    environment:
+      POSTGRES_DB: ${PSGL_NAME}
+      POSTGRES_USER: ${PSGL_USER}
+      POSTGRES_PASSWORD: ${PSGL_PASSWORD}
+      PGTZ: 'Asia/Tokyo'
+    volumes:
+      - ${DATA_PATH}/db/postgres-data:/var/lib/postgresql
+      - ${DATA_PATH}/db/postgres/script:/docker-entrypoint-initdb.d
+
+  ### Redis ################################################
+  redis:
+    container_name: ${PROJECT_NAME}-redis
+    build:
+      context: .
+      dockerfile: ./docker/redis/Dockerfile
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - ${DATA_PATH}/db/redis:/data
+    networks:
+      - backend
