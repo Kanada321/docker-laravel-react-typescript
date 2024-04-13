@@ -19,14 +19,14 @@ docker-compose exec npm install @mui/material @emotion/react @emotion/styled
 docker-compose exec php-fpm  npm install -D sass
 docker-compose exec php-fpm node --version
 docker-compose exec php-fpm bash -c "echo \$PATH"
-# パスが通ってなければ追加
+# /var/www/application/node_modules/.bin:のパスが通ってなければ追加
 docker-compose exec php-fpm tsc --init
 
 
 
 src/vite.config.js
 ↓
-src/vite.configts
+src/vite.config.ts
 -----
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
@@ -37,37 +37,39 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/sass/app.scss',
-                'resources/ts/index.tsx'
+                'resources/ts/app.tsx'
             ],
             refresh: true,
         }),
         react(),
     ],
     server: {
+        host: true,
         hmr: {
             host: 'localhost',
         },
-    },
+        watch: {
+            usePolling: true,
+        },
+    }
 });
+
 ---
 
-src/sass/app.scsss作成
+src/resources/sass/app.scsss作成
 ---
 p {
     font-size: 3rem;
 }
 ----
 
-src/ts/作成
+src/resources/ts/作成
 src/resources/ts/app.tsx　作成
-→　中身空にした。
-
-src/resources/ts/index.tsx　作成
 ----
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
-const Index:React.FC=()=>{
+const App:React.FC=()=>{
     return(
         <div>
             Hello World!!!
@@ -75,10 +77,10 @@ const Index:React.FC=()=>{
     );
 }
 
-const container = document.getElementById('index');
+const container = document.getElementById('app');
 if (container) {
     const root = createRoot(container);
-    root.render(<Index />);
+    root.render(<App />);
 }
 ----
 
@@ -91,10 +93,10 @@ src/resources/views/index.blade.php　作成
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Laravel</title>
     @viteReactRefresh
-    @vite(['resources/sass/app.scss', 'resources/ts/index.tsx'])
+    @vite(['resources/sass/app.scss', 'resources/ts/app.tsx'])
 </head>
 <body>
-<div id="index"></div>
+<div id="app"></div>
 </body>
 </html>
 ---
@@ -104,3 +106,12 @@ Route::get('{any}', function () {
     return view('index');
 })->where('any','.*');
 ----
+
+docker-compose exec php-fpm npm run build
+↓でHellow Worldが表示されていることを確認。
+http://localhost:801
+https://localhost:4431
+
+docker-compose exec php-fpm npm run dev
+docker-compose exec php-fpm php artisan serve
+http://localhost:801をリロードで、ホットリロードされることを確認（重い）

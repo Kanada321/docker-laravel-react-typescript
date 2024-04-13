@@ -1,8 +1,5 @@
 FROM php:8.2.17-fpm
 
-# Viteのサーバーにローカルからアクセスするために開ける
-EXPOSE 5173
-
 # Composerのインストール & パス通す
 COPY --from=composer:2.7.2 /usr/bin/composer /usr/bin/composer
 
@@ -24,6 +21,8 @@ ENV PATH="/var/www/application/node_modules/.bin:${PATH}"
 
 WORKDIR /var/www/application
 
+# Viteのサーバーにローカルからアクセスするために開ける
+EXPOSE 5173
 # Exxpose port 9000 and start php-fpm server
-#EXPOSE 9000
-#CMD ["php-fpm"]
+EXPOSE 9000
+CMD ["php-fpm"]
