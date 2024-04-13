@@ -7,7 +7,7 @@ https://reffect.co.jp/laravel/laravel-breeze-react
 
 
 # 構築手順
-docker-compose up -b
+docker-compose up -d
 docker-compose exec php-fpm composer create-project --prefer-dist laravel/laravel="10.*" .
 docker-compose exec php-fpm php artisan -V
 docker-compose exec php-fpm npm -V
