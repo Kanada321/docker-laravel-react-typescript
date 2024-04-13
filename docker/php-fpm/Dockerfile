@@ -4,10 +4,10 @@ FROM php:8.2.17-fpm
 EXPOSE 5173
 
 # Composerのインストール & パス通す
-COPY --from=composer:2.5.4 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.7.2 /usr/bin/composer /usr/bin/composer
 
-COPY --from=node:18.14.2 /usr/local/bin /usr/local/bin
-COPY --from=node:18.14.2 /usr/local/lib /usr/local/lib
+COPY --from=node:20.12.2 /usr/local/bin /usr/local/bin
+COPY --from=node:20.12.2 /usr/local/lib /usr/local/lib
 
 RUN apt-get update && \
     apt-get -y install \
