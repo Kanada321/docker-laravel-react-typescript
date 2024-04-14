@@ -186,3 +186,18 @@ Route::any('{all}', fn () => view('app'))
 
 
 ----
+docker-compose exec php-fpm npm run build
+↓でHellow Worldが表示されていることを確認。
+http://localhost:801
+https://localhost:4431
+
+docker-compose exec php-fpm npm run dev
+docker-compose exec php-fpm php artisan serve
+http://localhost:801をリロードで、ホットリロードされることを確認（重い）
+
+//明日は、React Routerの設定から行う
+https://www.webopixel.net/javascript/1815.html#google_vignette
+
+
+
+
