@@ -7,7 +7,7 @@ networks:
 volumes:
 #  mysql:
 #    driver: ${VOLUMES_DRIVER}
-  psgl:
+  pgsql:
     driver: ${VOLUMES_DRIVER}
   redis:
     driver: ${VOLUMES_DRIVER}
@@ -20,20 +20,20 @@ services:
     build:
       context: ./docker/php-fpm
       dockerfile: Dockerfile
-    ports:
-      - 5173:5173
     volumes:
       - ${WORK_DIR_BACKEND}:/var/www/application
-      - ./docker/php-fpm/settings/php.ini:/usr/local/etc/php/php.ini
+      - ./docker/php-fpm/settings/php.dev.ini:/usr/local/etc/php/conf.d/php.ini
       - ./docker/php-fpm/settings/www.dev.conf:/usr/local/etc/php-fpm.d/www.confFROM
     environment:
       - DB_CONNECTION=pgsql
-      - DB_HOST=db
-      - DB_PORT=${PSGL_PORT}
+      - DB_HOST=${PROJECT_NAME}-psgl
+      - DB_PORT=5432
       - DB_DATABASE=${PSGL_NAME}
       - DB_USERNAME=${PSGL_USER}
       - DB_PASSWORD=${PSGL_PASSWORD}
       - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - pgsql
     networks:
       - backend
 
@@ -52,13 +52,29 @@ services:
       - ./docker/nginx/conf.d/nginx.conf:/etc/nginx/nginx.conf
       - ${DATA_PATH}/logs/nginx:/var/log/nginx
       - ./docker/nginx/certs:/etc/ssl/certs
-#    depends_on:
-#      - php
+    depends_on:
+      - php-fpm
+    networks:
+      - backend
+
+  ### Nodejs(Laravel) ################################################
+  node:
+    container_name: ${PROJECT_NAME}-node
+    ports:
+      - 5173:5173
+    build:
+      context:  ./docker/node
+      dockerfile: Dockerfile
+    tty: true
+    volumes:
+      - ${WORK_DIR_BACKEND}:/var/www/application:delegated
+    #    depends_on:
+    #      - redis
     networks:
       - backend
 
   ### PostgreSQL #################################################
-  psgl:
+  pgsql:
     container_name: ${PROJECT_NAME}-psgl
     build:
       context: ./docker/postgres
@@ -73,6 +89,8 @@ services:
     volumes:
       - ${DATA_PATH}/db/postgres-data:/var/lib/postgresql
       - ${DATA_PATH}/db/postgres/script:/docker-entrypoint-initdb.d
+    networks:
+      - backend
 
   ### Redis ################################################
   redis:
@@ -81,7 +99,7 @@ services:
       context: .
       dockerfile: ./docker/redis/Dockerfile
     ports:
-      - "${REDIS_PORT}:6379"
+      - ${REDIS_PORT}:6379
     volumes:
       - ${DATA_PATH}/db/redis:/data
     networks:
