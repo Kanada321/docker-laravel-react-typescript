@@ -195,9 +195,77 @@ docker-compose exec php-fpm npm run dev
 docker-compose exec php-fpm php artisan serve
 http://localhost:801をリロードで、ホットリロードされることを確認（重い）
 
-//明日は、React Routerの設定から行う
+//React Routerの設定から行う
 https://www.webopixel.net/javascript/1815.html#google_vignette
+resources/ts/pages/Login.tsx
+
+import React from 'react'
+
+const LoginPage: React.FC = () => {
+    return (
+        <div>
+            <h1>ログイン</h1>
+        </div>
+    )
+}
+
+export default LoginPage
+
+resources/ts/pages/Dashboard.tsx
+import React from 'react'
+
+const DashboardPage: React.FC = () => {
+    return (
+        <div>
+            <h1>ダッシュボード</h1>
+        </div>
+    )
+}
+
+export default DashboardPage
 
 
+このページを表示する為のルーターファイルを作成
+resources/ts/routes.tsx
+import { createBrowserRouter } from 'react-router-dom'
+import DashboardPage from '@/pages/Dashboard'
+import LoginPage from '@/pages/Login'
 
+export const router = createBrowserRouter([
+    {
+        path: 'login',
+        element: <LoginPage />
+    }, {
+        path: '/',
+        element: <DashboardPage />
+    }
+])
 
+作成したルーターをApp.tsxで設定します。
+resources/ts/App.tsx
+import React from 'react'
+import { RouterProvider } from 'react-router-dom'
+import { router } from './routes'
+
+const App: React.FC = () => {
+    return (
+        <RouterProvider router={router} />
+    )
+}
+
+export default App
+
+resources/ts/index.tsx
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import App from '@/App'
+
+const root = createRoot(
+    document.getElementById('app') as HTMLElement
+)
+
+root.render(
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>
+)
