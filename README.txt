@@ -133,7 +133,7 @@ import { queryClient } from '@/queryClient'
 
 --
 ほかも変更が必要な箇所がある。
-上記の完了のsrc：https://github.com/Kanada321/ar-sticky-note/tree/app_work_20240417
+認証実装済みバックエンド：https://github.com/Kanada321/ar-sticky-note/tree/app_work_20240422
 ----
 他参考サイト
 https://tomozumi-system.com/2023/10/laravel10-vite-react-typescript-mui/
