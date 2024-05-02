@@ -2,6 +2,17 @@
 docker-compose up -d
 docker-compose exec php-fpm composer create-project --prefer-dist laravel/laravel="10.*" .
 
+docker-compose exec php-fpm php artisan -V
+docker-compose exec node npm -version
+docker-compose exec node npm install
+docker-compose exec node npm install -D react react-dom
+docker-compose exec node npm install -D @vitejs/plugin-react-refresh @vitejs/plugin-react
+docker-compose exec node npm install -D typescript @types/react @types/react-dom
+docker-compose exec node npm install @mui/material @emotion/react @emotion/styled
+docker-compose exec node npm install -D react-router-dom @types/react-router-dom @tanstack/react-query
+docker-compose exec node npm install -D sass
+docker-compose exec node node --version
+
 ーー
 いったんLaravelの初期設定を行う
 src/.env
