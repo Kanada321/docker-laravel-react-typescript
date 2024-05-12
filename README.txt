@@ -8,7 +8,7 @@ docker-compose exec node npm install
 docker-compose exec node npm install -D react react-dom
 docker-compose exec node npm install -D @vitejs/plugin-react-refresh @vitejs/plugin-react
 docker-compose exec node npm install -D typescript @types/react @types/react-dom
-docker-compose exec node npm install @mui/material @emotion/react @emotion/styled
+docker-compose exec node npm install @mui/material @emotion/react @emotion/styled @mui/icons-material
 docker-compose exec node npm install -D react-router-dom @types/react-router-dom @tanstack/react-query
 docker-compose exec node npm install -D sass
 docker-compose exec node node --version
